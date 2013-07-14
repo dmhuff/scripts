@@ -11,7 +11,7 @@
 
 TASK_FILE = 'next.txt'
 
-Task = Struct.new(:project, :task)
+NextTask = Struct.new(:project, :task)
 
 # Handle the CLI parameters.
 if ARGV.first == '--help' || ARGV.first == '-h'
@@ -27,8 +27,7 @@ files = File.exists?(TASK_FILE) ? [File.expand_path(TASK_FILE)] : []
 files.concat(Dir.glob("**/*/**/#{TASK_FILE}"))
 
 # Build a list of task objects.
-tasks = []
-files.each do |file_name|
+tasks = files.map do |file_name|
   # Read the file's first line.
   first_line = nil
   File.open(file_name) do |f|
@@ -41,7 +40,7 @@ files.each do |file_name|
     next
   end
 
-  tasks << Task.new(file_name.split('/')[-2], first_line)
+  NextTask.new(file_name.split('/')[-2], first_line)
 end
 
 # Print a Markdown report of tasks found.
@@ -57,4 +56,3 @@ else
        tasks.map { |t| "- #{t.project.ljust(max_project_len)} :: #{t.task}" },
        ''
 end
-
