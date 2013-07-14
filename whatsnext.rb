@@ -3,7 +3,7 @@
 # A script that searches a directory structure, and prints the next task for
 # each project directory found. In this context, a project directory is one
 # that contains a next.txt file; the next task for the project is the first
-# line of that file.
+# line of that file, formatted "#{date}: #{task}".
 #
 # Author::    Dave Huffman (dave \dot huffman \at me \dot com)
 # Copyright:: Copyright (c) 2013 Dave Huffman
@@ -11,7 +11,7 @@
 
 TASK_FILE = 'next.txt'
 
-NextTask = Struct.new(:project, :date, :task)
+Task = Struct.new(:project, :task)
 
 # Handle the CLI parameters.
 if ARGV.first == '--help' || ARGV.first == '-h'
@@ -27,9 +27,34 @@ files = File.exists?(TASK_FILE) ? [File.expand_path(TASK_FILE)] : []
 files.concat(Dir.glob("**/*/**/#{TASK_FILE}"))
 
 # Build a list of task objects.
+tasks = []
 files.each do |file_name|
-  puts file_name
+  # Read the file's first line.
+  first_line = nil
+  File.open(file_name) do |f|
+    f.each_line { |line| first_line = line; break; }
+  end
+
+  # Ensure we have something to work with.
+  if first_line.nil?
+    STDERR.puts "#{file_name} is empty."
+    next
+  end
+
+  tasks << Task.new(file_name.split('/')[-2], first_line)
 end
 
-# Print a report of tasks found.
-# TODO
+# Print a Markdown report of tasks found.
+if tasks.empty?
+  STDERR.puts('No tasks found.')
+else
+  tasks = tasks.sort { |l, r| l.task <=> r.task }
+  max_project_len = tasks.map { |t| t.project }.sort { |l, r| l.length <=> r.length }.last.length
+
+  puts 'Next tasks:',
+       '===========',
+       '',
+       tasks.map { |t| "- #{t.project.ljust(max_project_len)} :: #{t.task}" },
+       ''
+end
+
