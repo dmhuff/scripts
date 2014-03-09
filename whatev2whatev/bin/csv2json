@@ -4,7 +4,7 @@ require 'pp'
 require 'csv'
 
 $LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
-require 'csv_to_json'
+require 'whatev2whatev'
 
 csv = ARGF.read
 

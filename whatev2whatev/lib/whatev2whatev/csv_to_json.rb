@@ -23,7 +23,7 @@ class CsvToJson
     objects = data.map do |datum|
       hash = {}
       datum.each_with_index do |value, i|
-        key = headers[i].strip
+        key = headers[i].strip.to_camel_case
         hash[key] = value.strip
       end
       hash
