@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+require 'pp'
+require 'csv'
+
+$LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
+require 'table_to_array'
+
+html = ARGF.read
+
+TableToArray.instance.parse(html).each do |row|
+  puts row.to_csv
+end

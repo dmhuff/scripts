@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'pp'
+require 'csv'
+
+$LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
+require 'csv_to_json'
+
+csv = ARGF.read
+
+puts CsvToJson.instance.parse(csv)
